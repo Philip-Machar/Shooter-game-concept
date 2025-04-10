@@ -23,7 +23,7 @@ class Player {
 const player = new Player((canvas.width/2), (canvas.height/2), 20, 'blue');
 player.draw();
 
-class Projecttile {
+class Projectile {
     constructor(x, y, radius, color, velocity) {
         this.x = x;
         this.y = y;
@@ -40,21 +40,32 @@ class Projecttile {
     };
 
     update() {
+        this.draw();
         this.x += this.velocity.x;
         this.y += this.velocity.y;
     };
 };
 
-const projectile = new Projecttile(canvas.width/2, canvas.height/2, 5, 'red', {x: 1, y: 1});
-    projectile.draw();
-    projectile.update();
+const projectiles = [];
 
 const animate = () => {
     requestAnimationFrame(animate);
-    projectile.draw();
-    projectile.update();
-}
+    projectiles.forEach((projectile) => {
+        projectile.update();
+    });
+};
 
-canvas.addEventListener('click', () => {
-    animate();
+canvas.addEventListener('click', (event) => {
+    const angle = Math.atan2((event.clientY - canvas.height/2), (event.clientX - canvas.width/2));
+    const velocity = {
+        x: Math.cos(angle),
+        y: Math.sin(angle)
+    };
+
+    const projectile = new Projectile(canvas.width/2, canvas.height/2, 5, 'red', velocity);
+    
+    projectiles.push(projectile);
+
 });
+
+animate();
