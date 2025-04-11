@@ -42,7 +42,7 @@ const projectiles = [];
 
 function spawnEnemy() {
     setInterval(() => {
-        const radius = 20;
+        const radius = Math.floor(Math.random() * (30 - 5 + 1)) + 5;;
         const color = 'red';
         let x, y;
 
