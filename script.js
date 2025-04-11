@@ -20,7 +20,7 @@ class Player {
     }
 };
 
-const player = new Player((canvas.width/2), (canvas.height/2), 20, 'blue');
+const player = new Player((canvas.width/2), (canvas.height/2), 30, 'blue');
 
 class Projectile {
     constructor(x, y, radius, color, velocity) {
@@ -70,11 +70,42 @@ class Enemy {
     };
 };
 
-const enemies = []
+const enemies = [];
 
 const spawnEnemy = () => {
     setInterval(() => {
-        const enemy = new Enemy(100, 100, 30, 'red', {x: 1, y: 1});
+        const radius = 20;
+
+        let x, y
+        const edge = Math.floor(Math.random() * 4);
+        switch (edge) {
+            case 0:
+                x = -radius;
+                y = Math.random() * canvas.height;
+                break;
+            case 1:
+                x = canvas.width + radius;
+                y = Math.random() * canvas.height;
+                break;
+            case 2:
+                y = -radius;
+                x = Math.random() * canvas.width;
+                break;
+            case 3:
+                y = canvas.height + radius;
+                x = Math.random() * canvas.width;
+                break;
+        };
+
+        const color = 'red';
+
+        const angle = Math.atan2(canvas.height/2 - y, canvas.width/2 - x);
+        const velocity = {
+            x: Math.cos(angle), 
+            y: Math.sin(angle)
+        };
+        
+        const enemy = new Enemy(x, y, radius, color, velocity);
         enemies.push(enemy);
     }, 1000);
 };
