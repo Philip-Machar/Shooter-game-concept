@@ -4,137 +4,100 @@ const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-class Player {
+const CENTER_X = canvas.width / 2;
+const CENTER_Y = canvas.height / 2;
+
+class Circle {
     constructor(x, y, radius, color) {
-        this.x = x, 
-        this.y = y,
-        this.radius = radius;
-        this.color = color;
-    }
-
-    draw() {
-        ctx.fillStyle = 'blue';
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fill();
-    }
-};
-
-const player = new Player((canvas.width/2), (canvas.height/2), 30, 'blue');
-
-class Projectile {
-    constructor(x, y, radius, color, velocity) {
         this.x = x;
         this.y = y;
         this.radius = radius;
         this.color = color;
-        this.velocity = velocity;
     };
 
-    draw() {
+    draw(ctx) {
         ctx.fillStyle = this.color;
         ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);;
         ctx.fill();
-    };
-
-    update() {
-        this.draw();
-        this.x += this.velocity.x;
-        this.y += this.velocity.y;
     };
 };
 
+class MovingCircle extends Circle {
+    constructor(x, y, radius, color, velocity) {
+        super(x, y, radius, color);
+        this.velocity = velocity;
+    };
+
+    update(ctx) {
+        this.x += this.velocity.x;
+        this.y += this.velocity.y;
+        this.draw(ctx)
+    };
+};
+
+const player = new Circle(CENTER_X, CENTER_Y, 30, 'blue');
+const enemies = [];
 const projectiles = [];
 
-class Enemy {
-    constructor(x, y, radius, color, velocity) {
-        this.x = x;
-        this.y = y;
-        this.radius = radius;
-        this.color = color;
-        this.velocity = velocity;
-    };
-
-    draw() {
-        ctx.fillStyle = this.color;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fill();
-    };
-
-    update() {
-        this.draw();
-        this.x += this.velocity.x;
-        this.y += this.velocity.y;
-    };
-};
-
-const enemies = [];
-
-const spawnEnemy = () => {
+function spawnEnemy() {
     setInterval(() => {
         const radius = 20;
-
-        let x, y
-        const edge = Math.floor(Math.random() * 4);
-        switch (edge) {
-            case 0:
-                x = -radius;
-                y = Math.random() * canvas.height;
-                break;
-            case 1:
-                x = canvas.width + radius;
-                y = Math.random() * canvas.height;
-                break;
-            case 2:
-                y = -radius;
-                x = Math.random() * canvas.width;
-                break;
-            case 3:
-                y = canvas.height + radius;
-                x = Math.random() * canvas.width;
-                break;
-        };
-
         const color = 'red';
+        let x, y;
 
-        const angle = Math.atan2(canvas.height/2 - y, canvas.width/2 - x);
+        const edge = Math.floor(Math.random() * 4);
+
+        if (edge === 0) {
+            x = -radius;
+            y = Math.random() * canvas.height;
+        } else if (edge === 1) {
+            x = canvas.width + radius;
+            y = Math.random() * canvas.height;
+        } else if (edge === 2) {
+            x = Math.random() * canvas.width;
+            y = -radius;
+        } else {
+            x = Math.random() * canvas.width;
+            y = canvas.height + radius;
+        }
+
+        const angle = Math.atan2(CENTER_Y - y, CENTER_X - x);
+
         const velocity = {
-            x: Math.cos(angle), 
+            x: Math.cos(angle),
             y: Math.sin(angle)
-        };
-        
-        const enemy = new Enemy(x, y, radius, color, velocity);
+        }
+
+        const enemy = new MovingCircle(x, y, radius, color, velocity);
         enemies.push(enemy);
     }, 1000);
 };
 
-const animate = () => {
-    requestAnimationFrame(animate);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    player.draw();
-    projectiles.forEach((projectile) => {
-        projectile.update();
-    });
-
-    enemies.forEach((enemy) => {
-        enemy.update();
-    });
-};
-
 canvas.addEventListener('click', (event) => {
-    const angle = Math.atan2((event.clientY - canvas.height/2), (event.clientX - canvas.width/2));
+    const angle = Math.atan2(event.clientY - CENTER_Y, event.clientX - CENTER_X);
     const velocity = {
         x: Math.cos(angle),
         y: Math.sin(angle)
     };
 
-    const projectile = new Projectile(canvas.width/2, canvas.height/2, 5, 'red', velocity);
-    
+    const projectile = new MovingCircle(CENTER_X, CENTER_Y, 10, 'yellow', velocity);
     projectiles.push(projectile);
-
 });
+
+function animate() {
+    requestAnimationFrame(animate);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    player.draw(ctx);
+
+    enemies.forEach((enemy) => {
+        enemy.update(ctx);
+    });
+
+    projectiles.forEach((projectile) => {
+        projectile.update(ctx);
+    })
+};
 
 animate();
 spawnEnemy();
