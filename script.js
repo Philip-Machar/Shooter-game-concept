@@ -18,7 +18,7 @@ class Circle {
     draw(ctx) {
         ctx.fillStyle = this.color;
         ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);;
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
         ctx.fill();
     };
 };
@@ -42,7 +42,7 @@ const projectiles = [];
 
 function spawnEnemy() {
     setInterval(() => {
-        const radius = Math.floor(Math.random() * (30 - 10 + 1)) + 10;;
+        const radius = Math.floor(Math.random() * (30 - 10 + 1)) + 10;
         const color = 'red';
         let x, y;
 
@@ -85,16 +85,24 @@ canvas.addEventListener('click', (event) => {
     projectiles.push(projectile);
 });
 
+let animationId;
 function animate() {
-    requestAnimationFrame(animate);
+    animationId = requestAnimationFrame(animate);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     player.draw(ctx);
 
     enemies.forEach((enemy, enemyIndex) => {
         enemy.update(ctx);
+
+        const enemyPlayerDistance = Math.hypot(player.x - enemy.x, player.y - enemy.y);
+
+        if (enemyPlayerDistance < player.radius + enemy.radius){
+            cancelAnimationFrame(animateFrame);
+        };
+
         projectiles.forEach((projectile, projectileIndex) => {
-            const distance = Math.hypot(enemy.x - projectile.x, enemy.y - projectile.y);
-            if (distance < enemy.radius + projectile.radius) {
+            const enemyProjectileDistance = Math.hypot(enemy.x - projectile.x, enemy.y - projectile.y);
+            if (enemyProjectileDistance < enemy.radius + projectile.radius) {
                 setTimeout(() => {
                     enemies.splice(enemyIndex, 1);
                     projectiles.splice(projectileIndex, 1);
