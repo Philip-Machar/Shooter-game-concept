@@ -42,7 +42,7 @@ const projectiles = [];
 
 function spawnEnemy() {
     setInterval(() => {
-        const radius = Math.floor(Math.random() * (30 - 5 + 1)) + 5;;
+        const radius = Math.floor(Math.random() * (30 - 10 + 1)) + 10;;
         const color = 'red';
         let x, y;
 
@@ -90,8 +90,17 @@ function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     player.draw(ctx);
 
-    enemies.forEach((enemy) => {
+    enemies.forEach((enemy, enemyIndex) => {
         enemy.update(ctx);
+        projectiles.forEach((projectile, projectileIndex) => {
+            const distance = Math.hypot(enemy.x - projectile.x, enemy.y - projectile.y);
+            if (distance < enemy.radius + projectile.radius) {
+                setTimeout(() => {
+                    enemies.splice(enemyIndex, 1);
+                    projectiles.splice(projectileIndex, 1);
+                }, 0);
+            };
+        });
     });
 
     projectiles.forEach((projectile) => {
