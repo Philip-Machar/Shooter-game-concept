@@ -97,7 +97,7 @@ function animate() {
         const enemyPlayerDistance = Math.hypot(player.x - enemy.x, player.y - enemy.y);
 
         if (enemyPlayerDistance < player.radius + enemy.radius){
-            cancelAnimationFrame(animateFrame);
+            cancelAnimationFrame(animationId);
         };
 
         projectiles.forEach((projectile, projectileIndex) => {
@@ -111,8 +111,16 @@ function animate() {
         });
     });
 
-    projectiles.forEach((projectile) => {
+    projectiles.forEach((projectile, projectileIndex) => {
         projectile.update(ctx);
+        if (projectile.x + projectile.radius < 0 || 
+            projectile.x - projectile.radius > canvas.width || 
+            projectile.y + projectile.radius < 0 || projectile.y - projectile.radius > canvas.height) {
+            setTimeout(() => {
+                // projectile.splice(projectileIndex, 1);
+                player.color = 'purple'
+            });
+        }
     })
 };
 
